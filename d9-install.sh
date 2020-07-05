@@ -88,7 +88,7 @@ mysql -u "${db_user}" -p"${db_user_pass}" -e "DROP DATABASE IF EXISTS ${database
 
 # Install Drupal
 cd $WORKING_DIR/$site/web
-drush si -y standard --db-url=mysql://"${db_user}:${db_user_pass}"@localhost:3306/${site} --account-name=user --account-pass=password --account-mail=shawn@ccctampabay.com;
+drush si -y standard --db-url=mysql://"${db_user}:${db_user_pass}"@localhost:3306/${site} --account-name=user --account-pass=password --account-mail=YOUR@EMAILADRESS.com;
 
 
 # Update the file/dir owner.
