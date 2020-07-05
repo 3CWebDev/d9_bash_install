@@ -13,10 +13,13 @@ Automatically installs Drupal 9 from a bash script, including basic site setup &
 * Copies custom base (Bootstrap) theme.
 * Creates .gitignore file.
 * Creates the Drupal database.
+* Installs Drupal.
 * Creates vhost for new site.
 * Customizes settings.php file to set private file directory (outside of /web).
 * Creates and configure config sync directory (to be used for importing default configurations)
+* Imports default configuration from assets.
 * Copies custom .htaccess and robots.txt files.
-* Initializes new git repo.
+* Initializes new git repo and make intitial commit.
+* Creates Let's Encrypt SSL cert using Cert Bot.
 
 
