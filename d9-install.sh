@@ -145,7 +145,7 @@ chown -R www-data:www-data config
 chmod -R 775 config
 drush config:import -y
 
-drush cset user.settings register admin_only
+drush cset user.settings register admin_only -y
 drush pmu ccc_custom
 drush en ccc_custom
 drush cr;
