@@ -2,7 +2,7 @@
 
 # Author: Shawn Ostermann 
 # Composer Plugins for Drupal Developers
-# https://www.drupaleasy.com/blogs/ultimike/2020/06/composer-plugins-drupal-developers?utm_source=The+Weekly+Drop&utm_medium=email&utm_campaign=The_Weekly_Drop_Issue_443_06_25_2020
+
 
 # Read DB credentials from external file
 source /var/www/private-vars.cfg
@@ -25,8 +25,6 @@ database=$site;
 echo $database;
 
 # Create Drupal base via Composer
-#composer create-project drupal/recommended-project $site --no-interaction;
-
 composer create-project 3cwebdev/drupal-composer-install $site --no-interaction;
 
 cd  $WORKING_DIR/$site
@@ -36,17 +34,8 @@ composer install;
 # https://github.com/zaporylie/composer-drupal-optimizations
 # This composer-plugin contains a set of improvements that makes running heavy duty composer commands (i.e. composer update or composer require) much faster.
 composer require zaporylie/composer-drupal-optimizations:^1.1 --dev
-composer require 'drupal/backup_migrate:^5.0'
+#composer require 'drupal/backup_migrate:^5.0'
 
-
-# Install Drupal modules via Composer
-#composer require drupal/admin_toolbar drupal/module_filter drupal/shield drupal/prlp drupal/advagg drupal/ctools drupal/devel drupal/reroute_email drupal/field_group drupal/mailsystem drupal/backup_migrate drupal/pathauto drupal/responsive_menu drupal/token drupal/metatag drupal/antibot drupal/honeypot drupal/google_analytics drupal/back_to_top drupal/super_login drupal/xmlsitemap drupal/colorbox drupal/seo_checklist drupal/redirect drupal/coffee drupal/recaptcha drupal/recreate_block_content drupal/bootstrap
-
-# Install latest Drush 
-# composer require drush/drush
-
-# Patches functionality for Composer
-# composer require cweagans/composer-patches
 
 # Make the required directories.
 mkdir ./tmp;
@@ -61,6 +50,8 @@ cp -a $ASSETS_DIR/libraries/. web/libraries/
 
 # Copy custom module assets
 cp -a $ASSETS_DIR/custom_blocks/. web/modules/custom/custom_blocks
+cp -a $ASSETS_DIR/ccc_custom/. web/modules/custom/ccc_custom
+
 
 # Copy custom theme assets
 mkdir -p web/themes/custom/ccc_bs;
@@ -88,7 +79,7 @@ mysql -u "${db_user}" -p"${db_user_pass}" -e "DROP DATABASE IF EXISTS ${database
 
 # Install Drupal
 cd $WORKING_DIR/$site/web
-drush si -y standard --db-url=mysql://"${db_user}:${db_user_pass}"@localhost:3306/${site} --account-name=user --account-pass=password --account-mail=YOUR@EMAILADRESS.com;
+drush si -y standard --db-url=mysql://"${db_user}:${db_user_pass}"@localhost:3306/${site} --account-name=user --account-pass=password --account-mail=EMAIL@DOMAIN.com;
 
 
 # Update the file/dir owner.
@@ -121,10 +112,6 @@ echo -e $"\nNew Virtual Host Created\n"
 a2ensite $sitesAvailabledomain
 service apache2 reload
 
-# Use DB backup to set base site configuration
-#cd $WORKING_DIR/$site/web
-#drush sql-cli < $ASSETS_DIR/base_install_database.mysql
-
 
 # Remove old config_sync setting from end of settings.php file
 cd $WORKING_DIR/$site
@@ -137,6 +124,7 @@ cd $WORKING_DIR/$site/web
 #drush en -y menu_link_config
 
 # Set Drupal config sync dir
+
 cd $WORKING_DIR/$site
 mkdir config;
 mkdir config/sync;
@@ -145,10 +133,10 @@ chown -R www-data:www-data config/sync;
 chmod -R 775 config;
 
 # Perform config import
-# drush -y ev '\Drupal::entityManager()->getStorage("shortcut_set")->load("default")->delete();';
 drush entity:delete shortcut_set
 drush -y pm-uninstall shortcut -y;
-drush cr;
+
+
 cd $WORKING_DIR/$site/web;
 drush -y config-set "system.site" uuid $UUID
 cd $WORKING_DIR/$site;
@@ -157,10 +145,10 @@ chown -R www-data:www-data config
 chmod -R 775 config
 drush config:import -y
 
-#drush en -y menu_link_config
-#drush en -y recreate_block_content
-
-drush cr
+drush cset user.settings register admin_only
+drush pmu ccc_custom
+drush en ccc_custom
+drush cr;
 
 # Export config files
 #drush config:export -y
@@ -181,12 +169,6 @@ sudo chown -R www-data:www-data private;
 echo "\$settings['file_private_path'] = '../private';" >> web/sites/default/settings.php;
 #drush php:eval 'file_save_htaccess("../private")';
 
-# Housekeeping
-cd $WORKING_DIR/$site/web
-#drush -y updb
-#drush -y cset user.settings register admin_only
-#drush cr
-#drush cron
 
 # Set file and folder permissions
 echo "Setting file and folder permissions...";
@@ -201,7 +183,7 @@ chmod -R 775 vendor/drush
 chmod -R 775 web/libraries;
 chmod -R 775 web/themes/custom;
 chmod -R 775 web/modules/custom;
-#chown -R www-data:www-data web/sites/default/files/xmlsitemap
+
 
 cd web
 # Change directory permissions to 755.
